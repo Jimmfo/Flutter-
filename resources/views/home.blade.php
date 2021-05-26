@@ -1,4 +1,4 @@
-@extends('layouts.Dashboard')
+@extends('layouts.app')
 
 @section('content')
 <div class="container">
@@ -9,9 +9,9 @@
 
                 <div class="card-body">
                     @if (session('status'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('status') }}
-                        </div>
+                    <div class="alert alert-success" role="alert">
+                        {{ session('status') }}
+                    </div>
                     @endif
 
                     {{ __('Esta es una Bienvenida a la tienda donde  puedes hacer diferentes compras !') }}

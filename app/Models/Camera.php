@@ -9,6 +9,6 @@ class Camera extends Model
 {
     use HasFactory;
     protected $fillable=[
-        'Price','Seller','Color','Typecamera','Resolution','Screensize','Connectivity','ISOsensitivity','Description','Interfaces'
+       'image','Price','Seller','Color','Typecamera','Resolution','Screensize','Connectivity','ISOsensitivity','Description','Interfaces'
     ];
 }

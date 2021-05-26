@@ -9,7 +9,7 @@ class Fan extends Model
 {
     use HasFactory;
     protected $fillable=[
-        'Model','Mark','Price','Seller','Voltage','Fantype','Power','Speeds','RemoteControl','Feeding','Diameter'
+        'image','Model','Mark','Price','Seller','Voltage','Fantype','Power','Speeds','RemoteControl','Feeding','Diameter'
     ];
         
 }

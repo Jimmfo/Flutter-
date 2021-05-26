@@ -15,6 +15,7 @@ class CreateFansTable extends Migration
     {
         Schema::create('fans', function (Blueprint $table) {
             $table->id();
+            $table->string('image')->nullable();
             $table->string('Model');
             $table->string('Mark');
             $table->string('Price');

@@ -15,6 +15,7 @@ class CreateCamerasTable extends Migration
     {
         Schema::create('cameras', function (Blueprint $table) {
             $table->id();
+            $table->string('image')->nullable();
             $table->string('Price',2000);
             $table->string('Seller',3000);
             $table->string('Color');

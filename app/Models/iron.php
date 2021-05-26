@@ -9,6 +9,6 @@ class iron extends Model
 {
     use HasFactory;
     protected $fillable=[
-'Mark','Line','Model','Color','Voltage','Power','Typeofiron','Use','Description','Coment'
+        'image','Mark','Line','Model','Color','Voltage','Power','Typeofiron','Use','Description','Coment'
     ];
 }

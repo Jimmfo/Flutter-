@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\iron;
 use Illuminate\Http\Request;
+use App\Exports\IronExport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\IronImport;
 
 class IronController extends Controller
 {
@@ -36,9 +39,16 @@ class IronController extends Controller
      */
     public function store(Request $request)
     {
-      $iron=request()->except('_token');
-      Iron::insert($iron);
-       return redirect()->to(url('/irons'));//
+        $iron=$request->all();
+        if($img=$request->file('image')){
+            $destinationPaht='imagenes/planchas/';
+            $name=date('YmdHis').".".$img->getClientOriginalExtension();
+            $img->move($destinationPaht,$name);
+            $camera['image']="$name";
+        }
+        Iron::create($iron);
+
+         return redirect()->to(url('/irons'));//
     }
 
     /**
@@ -90,7 +100,7 @@ class IronController extends Controller
     return redirect()->to(url('/irons'));
  }
  public function exportironstoCSV(Request $request){
-   $fileName = 'iron.csv';
+   $fileName = 'iron.xml';
    $irons = Iron::all();
 
    $headers = array(
@@ -123,6 +133,42 @@ class IronController extends Controller
    };
 
    return response()->stream($callback, 200, $headers);
+}
+public function chart() {
+
+    $irons =Iron::select(\DB::raw("COUNT(*) as count"))
+        ->whereYear('created_at', date('Y'))
+        ->groupBy(\DB::raw("second(created_at)"))
+        ->pluck('count');
+
+    $irons2 =Iron::select(\DB::raw("COUNT(*) as count"))
+       ->whereBetween('Voltage', ([2, 100]))
+       ->groupBy(\DB::raw("Voltage"))
+       ->pluck('count');
+
+
+    return view('irons.chart')
+        ->with('irons', $irons)
+        ->with('irons2', $irons2);
+}
+
+
+public function cards() {
+    $irons = Iron::all();
+    return view('irons.cards', compact('irons'));
+}
+
+public function exportToXlsx() {
+    return Excel::download(new IronExport, 'irons.xlsx');
+}
+
+public function import() {
+    return view('irons.import');
+}
+
+public function importData(Request $request) {
+    Excel::import(new IronImport, request()->file('excel'));
+    return redirect()->to(url('irons'));
 }
 
 }

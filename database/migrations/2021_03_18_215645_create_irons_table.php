@@ -15,6 +15,7 @@ class CreateIronsTable extends Migration
     {
         Schema::create('irons', function (Blueprint $table) {
             $table->id();
+            $table->string('image')->nullable();
             $table->string('Mark',100);
             $table->string('Line',50);
             $table->string('Model',);
@@ -25,6 +26,7 @@ class CreateIronsTable extends Migration
             $table->string('Use');
             $table->text('Description');
             $table->string('Coment');
+            
             $table->timestamps();
         });
     }

@@ -31,7 +31,9 @@
                 <tbody>
                     <tr>
                         <td>
-                            <p>Imagen</p>
+                            <p><img style="width:200px; height:100; object-fit:cover;"
+                                    src="/imagenes/planchas/{{$iron->image}}" alt="{{$iron->Model}}">
+                                </img></p>
                         <td>
                             <p><b>Modelo:</b>{{$iron->Model}}</p>
                             <p><b>Color:</b>{{$iron->Color}}</p>

@@ -9,6 +9,6 @@ class Turntable extends Model
 {
     use HasFactory;
     protected $fillable=[
-        'Mark','Line','Model','Voltage','Playbackspeeds','Audiooutputs','WithUSB','Recording','TurntableMaterial','Includescapsule','Description'
+        'image','Mark','Line','Model','Voltage','Playbackspeeds','Audiooutputs','WithUSB','Recording','TurntableMaterial','Includescapsule','Description'
     ];
 }

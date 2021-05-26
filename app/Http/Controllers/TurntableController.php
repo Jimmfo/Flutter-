@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Turntable;
 use Illuminate\Http\Request;
+use App\Exports\TurntableExport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\TurntableImport;
 
 class TurntableController extends Controller
 {
@@ -36,9 +39,16 @@ class TurntableController extends Controller
      */
     public function store(Request $request)
     {
-        $turntable=request()->except('_token');
-        Turntable::insert($turntable);
-         return redirect()->to(url('/turntables'));
+         $turntable=$request->all();
+         if($img=$request->file('image')){
+             $destinationPaht='imagenes/tocadiscos/';
+             $name=date('YmdHis').".".$img->getClientOriginalExtension();
+             $img->move($destinationPaht,$name);
+             $camera['image']="$name";
+         }
+         Turntable::create($turntable);
+ 
+          return redirect()->to(url('/turntables'));
     }
 
     /**
@@ -89,7 +99,7 @@ class TurntableController extends Controller
         return redirect()->to(url('/turntables'));
     }
     public function exportturntablestoCSV(Request $request){
-        $fileName = 'turntables.csv';
+        $fileName = 'turntables.xml';
         $turntables =Turntable::all();
      
         $headers = array(
@@ -122,5 +132,51 @@ class TurntableController extends Controller
      
         return response()->stream($callback, 200, $headers);
      }
+     public function chart() {
+
+        $turntables =Turntable::select(\DB::raw("COUNT(*) as count"))
+            ->whereYear('created_at', date('Y'))
+            ->groupBy(\DB::raw("second(created_at)"))
+            ->pluck('count');
+
+        $turntables2 = Turntable::select(\DB::raw("COUNT(*) as count"))
+           ->whereBetween('Voltage', ([2, 100]))
+           ->groupBy(\DB::raw("Voltage"))
+           ->pluck('count');
+
+
+        return view('turntables.chart')
+            ->with('turntables', $turntables)
+            ->with('turntables2', $turntables2);
+    }
+
+
+    public function cards() {
+        $turntables = Turntable::all();
+        return view('turntables.cards', compact('turntables'));
+    }
+
+    public function exportToXlsx() {
+        return Excel::download(new TurntableExport, 'turntables.xlsx');
+    }
+
+    public function import() {
+        return view('turntables.import');
+    }
+
+    public function importData(Request $request) {
+        Excel::import(new TurntableImport, request()->file('excel'));
+        return redirect()->to(url('turntables'));
+    }
+    public function importxml() {
+        return view('turntables.import');
+    }
+
+    public function importDataxml(Request $request) {
+        Xml::import(new TurntableImport, request()->file('.xml'));
+        return redirect()->to(url('turntables'));
+    }
+    
+
      
 }

@@ -31,7 +31,9 @@
                 <tbody>
                     <tr>
                         <td>
-                            <p>Imagen</p>
+                            <p><img style="width:200px; height:100; object-fit:cover;"
+                                    src="/imagenes/tocadiscos/{{$turntable->image}}" alt="{{$turntable->Mark}}">
+                                </img></p>
                         <td>
                             <p><b>Modelo:</b>{{$turntable->Model}}</p>
                             <p><b>Línea:</b>{{$turntable->Line}}</p>

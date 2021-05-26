@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Camera;
 use Illuminate\Http\Request;
+use App\Exports\CameraExport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\CameraImport;
 
 class CameraController extends Controller
 {
@@ -36,8 +39,15 @@ class CameraController extends Controller
      */
     public function store(Request $request)
     {
-        $camera=request()->except('_token');
-        Camera::insert($camera);
+        $camera=$request->all();
+        if($img=$request->file('image')){
+            $destinationPaht='imagenes/camaras/';
+            $name=date('YmdHis').".".$img->getClientOriginalExtension();
+            $img->move($destinationPaht,$name);
+            $camera['image']="$name";
+        }
+        Camera::create($camera);
+
          return redirect()->to(url('/cameras'));
     }
 
@@ -92,11 +102,11 @@ class CameraController extends Controller
 
 
     public function exportCamerastoCSV(Request $request){
-        $fileName = 'camera.csv';
+        $fileName = 'camera.xml';
         $cameras = Camera::all();
 
         $headers = array(
-            "Content-type"        => "text/csv",
+            "Content-type"        => ".xml",
             "Content-Disposition" => "attachment; filename=$fileName",
             "Pragma"              => "no-cache",
             "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
@@ -118,7 +128,7 @@ class CameraController extends Controller
                 $row['ISOsensitivity']   = $camera->ISOsensitivity;
                 
 
-                fputcsv($file, array($row['Color'], $row['Description'], $row['Line'], $row['Seller'], $row['Connectivity'], $row['ISOsensitivity']));
+                fputxml($file, array($row['Color'], $row['Description'], $row['Line'], $row['Seller'], $row['Connectivity'], $row['ISOsensitivity']));
             }
 
             fclose($file);
@@ -126,6 +136,42 @@ class CameraController extends Controller
 
         return response()->stream($callback,200, $headers);
     }
+    public function chart() {
+
+        $cameras =Camera::select(\DB::raw("COUNT(*) as count"))
+            ->whereYear('created_at', date('Y'))
+            ->groupBy(\DB::raw("Minute(created_at)"))
+            ->pluck('count');
+
+        $cameras2 = Camera::select(\DB::raw("COUNT(*) as count"))
+           ->whereBetween('Screensize', ([2, 100]))
+           ->groupBy(\DB::raw("Screensize"))
+           ->pluck('count');
 
 
+        return view('cameras.chart')
+            ->with('cameras', $cameras)
+            ->with('cameras2', $cameras2);
+    }
+
+
+    public function cards() {
+        $cameras = Camera::all();
+        return view('cameras.cards', compact('cameras'));
+    }
+
+    public function exportToXlsx() {
+        return Excel::download(new CameraExport, 'cameras.xlsx');
+    }
+
+    public function import() {
+        return view('cameras.import');
+    }
+
+    public function importData(Request $request) {
+        Excel::import(new CameraImport, request()->file('excel'));
+        return redirect()->to(url('cameras'));
+    }
+    
+   
 }

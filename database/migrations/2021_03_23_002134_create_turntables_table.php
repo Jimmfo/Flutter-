@@ -15,6 +15,7 @@ class CreateTurntablesTable extends Migration
     {
         Schema::create('turntables', function (Blueprint $table) {
             $table->id();
+            $table->string('image')->nullable();
             $table->string('Mark');
             $table->string('Line');
             $table->string('Model');
